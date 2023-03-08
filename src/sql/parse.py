@@ -25,7 +25,7 @@ def _get_secrets(path: str) -> str:
 
 
 def connection_from_secrets(path: str):
-    parser = CP.ConfigParser()
+    parser = CP.ConfigParser(interpolation=None)
     parser.read_string(_get_secrets(path))
     cfg_dict = dict(parser.items('DEFAULT'))
     if 'password' not in cfg_dict:
