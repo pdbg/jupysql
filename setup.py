@@ -29,6 +29,7 @@ install_requires = [
 DEV = [
     "flake8",
     "pytest",
+    "pytest-mock",
     "pandas",
     "polars",
     "invoke",

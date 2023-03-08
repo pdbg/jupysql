@@ -1,10 +1,46 @@
 import itertools
 import shlex
+import subprocess
+import sys
 from os.path import expandvars
 
 from six.moves import configparser as CP
 from sqlalchemy.engine.url import URL
 from IPython.core.magic_arguments import parse_argstring
+
+
+def _get_secrets(path: str) -> str:
+    try:
+        response = subprocess.run(
+            ['pass', path],
+            encoding='utf-8',
+            capture_output=True,
+            check=True
+        )
+        return '[DEFAULT]\npass=' + response.stdout
+    except subprocess.CalledProcessError as e:
+        print('Unable to get secrets from {}'.format(path), file=sys.stderr)
+        print(e.stderr, file=sys.stderr)
+        raise Exception('Unable to retrieve database details from secret')
+
+
+def connection_from_secrets(path: str):
+    parser = CP.ConfigParser()
+    parser.read_string(_get_secrets(path))
+    cfg_dict = dict(parser.items('DEFAULT'))
+    if 'password' not in cfg_dict:
+        cfg_dict['password'] = cfg_dict['pass']
+    cfg_dict = {
+        key: value for key, value in cfg_dict.items() if key in (
+            'drivername',
+            'host',
+            'username',
+            'password',
+            'database',
+            'port'
+        )
+    }
+    return str(URL.create(**cfg_dict))
 
 
 def connection_from_dsn_section(section, config):

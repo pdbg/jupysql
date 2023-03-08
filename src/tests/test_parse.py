@@ -1,11 +1,13 @@
 import os
 from pathlib import Path
+import subprocess
 
 
 import pytest
 
 from sql.parse import (
     connection_from_dsn_section,
+    connection_from_secrets,
     parse,
     without_sql_comment,
     magic_args,
@@ -94,6 +96,37 @@ def test_parse_connect_shovel_over_newlines():
         "sql": "SELECT *\nFROM work",
         "result_var": "dest",
     }
+
+
+def test_connection_from_secrets(mocker):
+    testcases = (
+        # mysql testcase
+        (
+            'src/tests/test_secret_config_1.ini',
+            "mysql://dbuser:#BvTS@dbhost:3307/test",
+        ),
+        # postgres testcase
+        (
+            'src/tests/test_secret_config_2.ini',
+            "postgres://dbuser:#BvTS@dbhost:5432/test",
+        ),
+        # default password
+        (
+            'src/tests/test_secret_config_2.ini',
+            "postgres://dbuser:#BvTS@dbhost:5432/test",
+        ),
+    )
+    for filename, expected in testcases:
+        with open(filename) as f1:
+            mocker.patch(
+                'subprocess.run',
+                return_value=subprocess.CompletedProcess(
+                    args='',
+                    returncode=0,
+                    stdout=f1.read()
+                )
+            )
+        assert connection_from_secrets(path="dummy") == expected
 
 
 class DummyConfig:

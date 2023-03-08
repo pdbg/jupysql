@@ -183,6 +183,12 @@ class SqlMagic(Magics, Configurable):
         type=str,
         help="specify dictionary of connection arguments to pass to SQL driver",
     )
+    @argument(
+        "-P",
+        "--pass_path",
+        type=str,
+        help="Retrieve connection string from pass (password manager)"
+    )
     @argument("-f", "--file", type=str, help="Run SQL from file at this path")
     @argument("-S", "--save", type=str, help="Save this query for later use")
     @argument(
@@ -269,6 +275,9 @@ class SqlMagic(Magics, Configurable):
             return sql.connection.Connection._close(args.close)
 
         connect_arg = command.connection
+
+        if args.pass_path:
+            connect_arg = sql.parse.connection_from_secrets(args.pass_path)
 
         if args.section:
             connect_arg = sql.parse.connection_from_dsn_section(args.section, self)
