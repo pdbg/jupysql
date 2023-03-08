@@ -103,7 +103,7 @@ def test_connection_from_secrets(mocker):
         # mysql testcase
         (
             'src/tests/test_secret_config_1.ini',
-            "mysql://dbuser:#BvTS@dbhost:3307/test",
+            "mysql://dbuser:#BvTS$%asd@dbhost:3307/test",
         ),
         # postgres testcase
         (
