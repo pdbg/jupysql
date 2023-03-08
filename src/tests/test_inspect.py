@@ -1,4 +1,3 @@
-from inspect import getsource
 import sqlite3
 import pytest
 from functools import partial
