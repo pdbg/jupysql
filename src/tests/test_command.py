@@ -136,6 +136,7 @@ def test_args(ip, sql_magic):
         "no_index": False,
         "append": False,
         "connection_arguments": None,
+        "pass_path": None,
         "file": None,
         "save": None,
         "with_": ["author_one"],
