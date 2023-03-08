@@ -9,7 +9,6 @@ from io import StringIO
 import prettytable
 import sqlalchemy
 import sqlparse
-import sql.connection
 from .column_guesser import ColumnGuesserMixin
 
 try:
