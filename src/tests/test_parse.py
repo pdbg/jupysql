@@ -221,6 +221,7 @@ def complete_with_defaults(mapping):
         "no_index": False,
         "append": False,
         "connection_arguments": None,
+        "pass_path": None,
         "file": None,
         "save": None,
         "with_": None,
