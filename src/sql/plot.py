@@ -18,7 +18,6 @@ except ModuleNotFoundError:
 
 from sql.store import store
 import sql.connection
-from sql.telemetry import telemetry
 
 
 def _summary_stats(con, table, column, with_=None):
@@ -193,8 +192,7 @@ def _boxplot_stats(con, table, column, whis=1.5, autorange=False, with_=None):
 
 # https://github.com/matplotlib/matplotlib/blob/ddc260ce5a53958839c244c0ef0565160aeec174/lib/matplotlib/axes/_axes.py#L3915
 @requires(["matplotlib"])
-@telemetry.log_call("boxplot", payload=True)
-def boxplot(payload, table, column, *, orient="v", with_=None, conn=None):
+def boxplot(table, column, *, orient="v", with_=None, conn=None):
     """Plot boxplot
 
     Parameters
@@ -244,8 +242,6 @@ def boxplot(payload, table, column, *, orient="v", with_=None, conn=None):
     if not conn:
         conn = sql.connection.Connection.current.session
 
-    payload["connection_info"] = sql.connection.Connection._get_curr_connection_info()
-
     ax = plt.gca()
     vert = orient == "v"
 
@@ -286,8 +282,7 @@ FROM "{{table}}"
 
 
 @requires(["matplotlib"])
-@telemetry.log_call("histogram", payload=True)
-def histogram(payload, table, column, bins, with_=None, conn=None):
+def histogram(table, column, bins, with_=None, conn=None):
     """Plot histogram
 
     Parameters
@@ -326,7 +321,6 @@ def histogram(payload, table, column, bins, with_=None, conn=None):
     .. plot:: ../examples/plot_histogram_many.py
     """
     ax = plt.gca()
-    payload["connection_info"] = sql.connection.Connection._get_curr_connection_info()
     if isinstance(column, str):
         bin_, height = _histogram(table, column, bins, with_=with_, conn=conn)
         ax.bar(bin_, height, align="center", width=bin_[-1] - bin_[-2])

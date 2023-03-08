@@ -3,7 +3,6 @@ from prettytable import PrettyTable
 from ploomber_core.exceptions import modify_exceptions
 
 from sql.connection import Connection
-from sql.telemetry import telemetry
 
 
 def _get_inspector(conn):
@@ -73,13 +72,11 @@ class Columns(DatabaseInspection):
         self._table_txt = self._table.get_string()
 
 
-@telemetry.log_call()
 def get_table_names(schema=None):
     """Get table names for a given connection"""
     return Tables(schema)
 
 
-@telemetry.log_call()
 def get_columns(name, schema=None):
     """Get column names for a given connection"""
     return Columns(name, schema)

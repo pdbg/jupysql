@@ -30,8 +30,6 @@ except ImportError:
     DataFrame = None
     Series = None
 
-from sql.telemetry import telemetry
-
 
 @magics_class
 class RenderMagic(Magics):
@@ -51,7 +49,6 @@ class RenderMagic(Magics):
         action="append",
         dest="with_",
     )
-    @telemetry.log_call("sqlrender")
     def sqlrender(self, line):
         args = parse_argstring(self.sqlrender, line)
         return str(store[args.line[0]])
@@ -116,7 +113,6 @@ class SqlMagic(Magics, Configurable):
     )
     autocommit = Bool(True, config=True, help="Set autocommit mode")
 
-    @telemetry.log_call("init")
     def __init__(self, shell):
         self._store = store
 
@@ -240,8 +236,7 @@ class SqlMagic(Magics, Configurable):
         """
         return self._execute(line=line, cell=cell, local_ns=local_ns)
 
-    @telemetry.log_call("execute", payload=True)
-    def _execute(self, payload, line, cell, local_ns):
+    def _execute(self, line, cell, local_ns):
         """
         This function implements the cell logic; we create this private
         method so we can control how the function is called. Otherwise,
@@ -310,9 +305,6 @@ class SqlMagic(Magics, Configurable):
             creator=args.creator,
             alias=args.alias,
         )
-        payload[
-            "connection_info"
-        ] = sql.connection.Connection._get_curr_connection_info()
         if args.persist:
             return self._persist_dataframe(
                 command.sql, conn, user_ns, append=False, index=not args.no_index

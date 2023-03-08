@@ -96,14 +96,3 @@ def test_nonexistent_table(name, schema, error):
         inspect.get_columns(name, schema)
 
     assert error.lower() in str(excinfo.value).lower()
-
-
-@pytest.mark.parametrize(
-    "function",
-    [
-        inspect.get_table_names,
-        inspect.get_columns,
-    ],
-)
-def test_telemetry(function):
-    assert "@telemetry.log_call" in getsource(function)

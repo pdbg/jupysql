@@ -17,8 +17,6 @@ try:
 except ImportError:
     PGSpecial = None
 
-from sql.telemetry import telemetry
-
 
 def unduplicate_field_names(field_names):
     """Append a number to duplicate field names to make them unique."""
@@ -164,18 +162,13 @@ class ResultSet(list, ColumnGuesserMixin):
         for row in self:
             yield dict(zip(self.keys, row))
 
-    @telemetry.log_call("data-frame", payload=True)
-    def DataFrame(self, payload):
+    def DataFrame(self):
         "Returns a Pandas DataFrame instance built from the result set."
         import pandas as pd
 
         frame = pd.DataFrame(self, columns=(self and self.keys) or [])
-        payload[
-            "connection_info"
-        ] = sql.connection.Connection._get_curr_connection_info()
         return frame
 
-    @telemetry.log_call("polars-data-frame")
     def PolarsDataFrame(self):
         "Returns a Polars DataFrame instance built from the result set."
         import polars as pl
@@ -183,7 +176,6 @@ class ResultSet(list, ColumnGuesserMixin):
         frame = pl.DataFrame((tuple(row) for row in self), schema=self.keys)
         return frame
 
-    @telemetry.log_call("pie")
     def pie(self, key_word_sep=" ", title=None, **kwargs):
         """Generates a pylab pie chart from the result set.
 
@@ -214,7 +206,6 @@ class ResultSet(list, ColumnGuesserMixin):
         ax.set_title(title or self.ys[0].name)
         return ax
 
-    @telemetry.log_call("plot")
     def plot(self, title=None, **kwargs):
         """Generates a pylab plot from the result set.
 
@@ -253,7 +244,6 @@ class ResultSet(list, ColumnGuesserMixin):
 
         return ax
 
-    @telemetry.log_call("bar")
     def bar(self, key_word_sep=" ", title=None, **kwargs):
         """Generates a pylab bar plot from the result set.
 
@@ -288,7 +278,6 @@ class ResultSet(list, ColumnGuesserMixin):
         ax.set_ylabel(self.ys[0].name)
         return ax
 
-    @telemetry.log_call("generate-csv")
     def csv(self, filename=None, **format_params):
         """Generate results in comma-separated form.  Write to ``filename`` if given.
         Any other parameters will be passed on to csv.writer."""

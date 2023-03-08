@@ -7,7 +7,7 @@ except ModuleNotFoundError:
 
 
 telemetry = Telemetry(
-    api_key="phc_P9SpSeypyPwxrMdFn2edOOEooQioF2axppyEeDwtMSP",
+    api_key="phc",
     package_name="jupysql",
     version=version("jupysql"),
 )
