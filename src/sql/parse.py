@@ -7,6 +7,7 @@ from os.path import expandvars
 from six.moves import configparser as CP
 from sqlalchemy.engine.url import URL
 from IPython.core.magic_arguments import parse_argstring
+from sshtunnel import SSHTunnelForwarder
 
 
 def _get_secrets(path: str) -> str:
@@ -24,12 +25,30 @@ def _get_secrets(path: str) -> str:
         raise Exception('Unable to retrieve database details from secret')
 
 
+def _establish_ssl_tunnel(cfg: dict[str, str]) -> dict[str, str]:
+    ssh_keys = ('ssh_host', 'ssh_user', 'ssh_port', 'ssh_key_file')
+    for key in ssh_keys:
+        if key not in cfg:
+            return cfg
+    server = SSHTunnelForwarder(
+        (cfg['ssh_host'], cfg['port']),
+        ssh_username=cfg['ssh_user'],
+        ssh_pkey=cfg['ssh_key_file'],  # or ssh_password.
+        remote_bind_address=(cfg['host'], cfg['port'])
+    )
+    server.start()
+    cfg['host'] = server.local_bind_host
+    cfg['port'] = server.local_bind_port
+    return cfg
+
+
 def connection_from_secrets(path: str):
     parser = CP.ConfigParser(interpolation=None)
     parser.read_string(_get_secrets(path))
     cfg_dict = dict(parser.items('DEFAULT'))
     if 'password' not in cfg_dict:
         cfg_dict['password'] = cfg_dict['pass']
+    cfg_dict = _establish_ssl_tunnel(cfg_dict)
     cfg_dict = {
         key: value for key, value in cfg_dict.items() if key in (
             'drivername',
