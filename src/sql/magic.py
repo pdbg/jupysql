@@ -303,7 +303,8 @@ class SqlMagic(Magics, Configurable):
             displaycon=self.displaycon,
             connect_args=args.connection_arguments,
             creator=args.creator,
-            alias=args.alias,
+            # default to pass_path
+            alias=args.alias if args.alias else args.pass_path,
         )
         if args.persist:
             return self._persist_dataframe(
