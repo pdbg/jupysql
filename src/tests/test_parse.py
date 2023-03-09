@@ -117,10 +117,11 @@ def test_connection_from_secrets(mocker):
         ),
     )
 
-    def mock_start(self):
+    def mock_fun(self, *args, **kargs):
         pass
 
-    mocker.patch('sshtunnel.SSHTunnelForwarder.start', mock_start)
+    mocker.patch('sshtunnel.SSHTunnelForwarder.__init__', mock_fun)
+    mocker.patch('sshtunnel.SSHTunnelForwarder.start', mock_fun)
     mocker.patch('sshtunnel.SSHTunnelForwarder.local_bind_host', 'localhost')
     mocker.patch('sshtunnel.SSHTunnelForwarder.local_bind_port', '33005')
 
