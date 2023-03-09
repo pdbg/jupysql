@@ -103,7 +103,7 @@ def test_connection_from_secrets(mocker):
         # mysql testcase
         (
             'src/tests/test_secret_config_1.ini',
-            "mysql://dbuser:#BvTS$%asd@dbhost:3307/test",
+            "mysql://dbuser:#BvTS$%asd@localhost:33005/test",
         ),
         # postgres testcase
         (
@@ -116,6 +116,14 @@ def test_connection_from_secrets(mocker):
             "postgres://dbuser:#BvTS@dbhost:5432/test",
         ),
     )
+
+    def mock_start(self):
+        pass
+
+    mocker.patch('sshtunnel.SSHTunnelForwarder.start', mock_start)
+    mocker.patch('sshtunnel.SSHTunnelForwarder.local_bind_host', 'localhost')
+    mocker.patch('sshtunnel.SSHTunnelForwarder.local_bind_port', '33005')
+
     for filename, expected in testcases:
         with open(filename) as f1:
             mocker.patch(

@@ -26,15 +26,15 @@ def _get_secrets(path: str) -> str:
 
 
 def _establish_ssl_tunnel(cfg: dict[str, str]) -> dict[str, str]:
-    ssh_keys = ('ssh_host', 'ssh_user', 'ssh_port', 'ssh_key_file')
+    ssh_keys = ('ssh_host', 'ssh_user', 'ssh_key_file')
     for key in ssh_keys:
         if key not in cfg:
             return cfg
     server = SSHTunnelForwarder(
-        (cfg['ssh_host'], cfg['port']),
+        (cfg['ssh_host'], int(cfg.get('ssh_port', '22'))),
         ssh_username=cfg['ssh_user'],
         ssh_pkey=cfg['ssh_key_file'],  # or ssh_password.
-        remote_bind_address=(cfg['host'], cfg['port'])
+        remote_bind_address=(cfg['host'], int(cfg['port']))
     )
     server.start()
     cfg['host'] = server.local_bind_host
