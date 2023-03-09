@@ -25,7 +25,7 @@ def _get_secrets(path: str) -> str:
         raise Exception('Unable to retrieve database details from secret')
 
 
-def _establish_ssl_tunnel(cfg: dict[str, str]) -> dict[str, str]:
+def _establish_ssl_tunnel(cfg):
     ssh_keys = ('ssh_host', 'ssh_user', 'ssh_key_file')
     for key in ssh_keys:
         if key not in cfg:
